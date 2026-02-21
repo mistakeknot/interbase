@@ -3,9 +3,10 @@
 # Sources live ~/.intermod/ copy if present; falls back to inline stubs.
 
 [[ -n "${_INTERBASE_LOADED:-}" ]] && return 0
-_INTERBASE_LOADED=1   # Set unconditionally before source attempt [M1]
 
 # Try centralized copy first (ecosystem users)
+# NOTE: Do NOT set _INTERBASE_LOADED before sourcing — the live copy
+# sets it itself. Setting it here would trigger the live copy's guard.
 _interbase_live="${INTERMOD_LIB:-${HOME}/.intermod/interbase/interbase.sh}"
 if [[ -f "$_interbase_live" ]]; then
     _INTERBASE_SOURCE="live"
@@ -14,6 +15,7 @@ if [[ -f "$_interbase_live" ]]; then
 fi
 
 # Fallback: inline stubs (standalone users)
+_INTERBASE_LOADED=1
 _INTERBASE_SOURCE="stub"
 ib_has_ic()          { command -v ic &>/dev/null; }
 ib_has_bd()          { command -v bd &>/dev/null; }
