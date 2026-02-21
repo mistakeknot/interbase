@@ -74,7 +74,7 @@ _ib_nudge_session_count() {
     local sf
     sf="$(_ib_nudge_session_file)"
     [[ -f "$sf" ]] || { echo "0"; return; }
-    command -v jq &>/dev/null || { echo "0"; return; }
+    command -v jq &>/dev/null || { echo "99"; return; }  # [M8] No jq → budget exhausted (silent)
     jq -r '.count // 0' "$sf" 2>/dev/null || echo "0"
 }
 
@@ -92,7 +92,7 @@ _ib_nudge_is_dismissed() {
     local nf key
     nf="$(_ib_nudge_state_file)"
     [[ -f "$nf" ]] || return 1
-    command -v jq &>/dev/null || return 1
+    command -v jq &>/dev/null || return 0  # [M8] No jq → treat as dismissed (silent), not fire always
     key="${plugin}:${companion}"
     local dismissed
     dismissed=$(jq -r --arg k "$key" '.[$k].dismissed // false' "$nf" 2>/dev/null) || return 1
