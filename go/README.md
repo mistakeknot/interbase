@@ -85,6 +85,50 @@ wrapped := fmt.Errorf("handler failed: %w", te)
 recovered := toolerror.FromError(wrapped) // non-nil, Type == "TRANSIENT"
 ```
 
+### mcputil
+
+MCP tool handler middleware. Wraps mcp-go handlers with timing, error counting, panic recovery, and structured error conversion.
+
+```go
+import "github.com/mistakeknot/interbase/mcputil"
+```
+
+#### Middleware
+
+Register with `server.WithToolHandlerMiddleware()` to instrument all tool calls:
+
+```go
+metrics := mcputil.NewMetrics()
+s := server.NewMCPServer("myserver", "0.1.0",
+    server.WithToolHandlerMiddleware(metrics.Instrument()),
+)
+
+// Later — read per-tool metrics:
+for name, stats := range metrics.ToolMetrics() {
+    fmt.Printf("%s: %d calls, %d errors, %s total\n", name, stats.Calls, stats.Errors, stats.Duration)
+}
+```
+
+The middleware applies to every handler automatically:
+- **Timing**: accumulates `time.Since(start)` per tool (atomic nanosecond counter)
+- **Error wrapping**: if handler returns `(nil, error)`, converts to `(ToolError.JSON(), nil)` — agents always see structured errors
+- **Error counting**: increments per-tool counter on both Go errors and `isError` results
+- **Panic recovery**: catches panics, returns `ErrInternal` ToolError
+
+#### Convenience helpers
+
+Replace verbose `mcp.NewToolResultError(toolerror.New(...).JSON()), nil` with one-liners:
+
+```go
+return mcputil.ValidationError("field %q is required", name)
+return mcputil.NotFoundError("agent %q not found", id)
+return mcputil.ConflictError("file already reserved")
+return mcputil.TransientError("service unavailable: %v", err)
+return mcputil.WrapError(err)  // wraps any error as ErrInternal
+```
+
+All helpers return `(*mcp.CallToolResult, error)` — the standard MCP handler return signature.
+
 ## Setup
 
 Since interbase lives in the monorepo and isn't published to a Go module proxy, consumers use a `replace` directive:
@@ -108,7 +152,7 @@ go test ./...
 
 | Module | Scope |
 |--------|-------|
-| interlock | All 12 MCP tool handlers |
+| interlock | All 12 MCP tool handlers (toolerror + mcputil middleware + helpers) |
 
 ## Design
 

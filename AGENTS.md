@@ -20,6 +20,9 @@ sdk/interbase/
     toolerror/
       toolerror.go      — structured error contract for MCP servers
       toolerror_test.go — 9 tests
+    mcputil/
+      instrument.go      — tool handler middleware (timing, errors, panics, metrics)
+      instrument_test.go — 8 tests
   install.sh            — deploy Bash SDK to ~/.intermod/interbase/
 ```
 
@@ -88,10 +91,44 @@ replace github.com/mistakeknot/interbase => ../../sdk/interbase/go
 
 **Adopters:** interlock (all 12 tools)
 
+### mcputil — MCP Tool Handler Middleware
+
+Wraps mcp-go tool handlers with instrumentation. Register via `server.WithToolHandlerMiddleware()`.
+
+**Features:**
+- **Timing**: per-tool call duration tracking (atomic nanosecond counters)
+- **Error counting**: increments per-tool error counter on Go errors and `isError` results
+- **Error wrapping**: converts unhandled Go errors to structured ToolError JSON
+- **Panic recovery**: catches panics, returns `ErrInternal` ToolError
+
+**Usage:**
+```go
+import "github.com/mistakeknot/interbase/mcputil"
+
+metrics := mcputil.NewMetrics()
+s := server.NewMCPServer("myserver", "0.1.0",
+    server.WithToolHandlerMiddleware(metrics.Instrument()),
+)
+
+// Read metrics snapshot:
+stats := metrics.ToolMetrics()  // map[string]ToolStats
+```
+
+**Convenience helpers** (replace verbose `mcp.NewToolResultError(toolerror.New(...).JSON()), nil`):
+```go
+return mcputil.ValidationError("field %q is required", name)
+return mcputil.NotFoundError("agent %q not found", id)
+return mcputil.ConflictError("file already reserved")
+return mcputil.TransientError("service unavailable")
+return mcputil.WrapError(err)  // wraps any error as ErrInternal
+```
+
+**Adopters:** interlock (middleware + helpers in all 12 tools)
+
 ### Test Commands
 
 ```bash
-cd go && go test ./...   # 9 tests
+cd go && go test ./...   # 17 tests (9 toolerror + 8 mcputil)
 ```
 
 ## Install (Bash SDK)

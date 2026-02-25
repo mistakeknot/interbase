@@ -27,6 +27,7 @@ INTERMOD_LIB=/nonexistent bash your-hook.sh
 Shared Go packages for Demarch MCP servers. Import via `github.com/mistakeknot/interbase`.
 
 - **`toolerror`** — Structured error contract for MCP tool handlers. Types: `NOT_FOUND`, `CONFLICT`, `VALIDATION`, `PERMISSION`, `TRANSIENT`, `INTERNAL`. Use `replace` directive in consumer go.mod: `replace github.com/mistakeknot/interbase => ../../sdk/interbase/go`
+- **`mcputil`** — MCP tool handler middleware: timing metrics, error counting, panic recovery, structured error wrapping. Use `metrics.Instrument()` with `server.WithToolHandlerMiddleware()`. Also provides convenience helpers: `ValidationError()`, `NotFoundError()`, `ConflictError()`, `TransientError()`, `WrapError()`
 
 ## Design Decisions (Do Not Re-Ask)
 
