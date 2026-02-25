@@ -1,13 +1,13 @@
 # interbase — Shared Integration SDK
 
-Centralized Bash SDK enabling Interverse plugins to work in both standalone (Claude Code marketplace) and integrated (Clavain/Intercore ecosystem) modes.
+Multi-language SDK enabling Interverse plugins to work in both standalone (Claude Code marketplace) and integrated (Clavain/Intercore ecosystem) modes. Bash SDK for hooks, Go SDK for MCP servers.
 
 ## File Structure
 
 ```
 sdk/interbase/
   lib/
-    interbase.sh    — core SDK (installed to ~/.intermod/interbase/)
+    interbase.sh    — core Bash SDK (installed to ~/.intermod/interbase/)
     VERSION         — semver for installed copy
   templates/
     interbase-stub.sh   — shipped inside each plugin
@@ -15,7 +15,12 @@ sdk/interbase/
   tests/
     test-guards.sh      — guard function + stub fallback tests
     test-nudge.sh       — nudge protocol tests
-  install.sh            — deploy to ~/.intermod/interbase/
+  go/
+    go.mod              — Go module: github.com/mistakeknot/interbase
+    toolerror/
+      toolerror.go      — structured error contract for MCP servers
+      toolerror_test.go — 9 tests
+  install.sh            — deploy Bash SDK to ~/.intermod/interbase/
 ```
 
 ## Function Reference
@@ -43,7 +48,53 @@ sdk/interbase/
 - `_ib_nudge_session_count`, `_ib_nudge_session_increment` — session budget tracking
 - `_ib_nudge_is_dismissed`, `_ib_nudge_record` — durable dismissal (3 ignores = dismissed)
 
-## Install
+## Go SDK
+
+Shared Go packages for Demarch MCP servers. Module: `github.com/mistakeknot/interbase`.
+
+### toolerror — Structured MCP Error Contract
+
+All Demarch MCP tool handlers should return `ToolError` instead of flat error strings, enabling agents to distinguish transient from permanent failures.
+
+**Error types:**
+| Constant | Value | Default Recoverable | Use case |
+|----------|-------|---------------------|----------|
+| `ErrNotFound` | `NOT_FOUND` | false | Resource doesn't exist |
+| `ErrConflict` | `CONFLICT` | false | Concurrent modification |
+| `ErrValidation` | `VALIDATION` | false | Invalid input/arguments |
+| `ErrPermission` | `PERMISSION` | false | Access denied |
+| `ErrTransient` | `TRANSIENT` | true | Temporary failure, safe to retry |
+| `ErrInternal` | `INTERNAL` | false | Unexpected server error |
+
+**Usage:**
+```go
+import "github.com/mistakeknot/interbase/toolerror"
+
+// In MCP tool handler:
+return mcp.NewToolResultError(toolerror.New(toolerror.ErrNotFound, "agent %q not found", name).JSON()), nil
+
+// Convert client errors:
+te := toolerror.Wrap(err)  // passthrough if already ToolError, else ErrInternal
+
+// Add context:
+toolerror.New(toolerror.ErrConflict, "version mismatch").WithRecoverable(true).WithData(map[string]any{"file": "main.go"})
+```
+
+**Consumer setup** — add to your `go.mod`:
+```
+require github.com/mistakeknot/interbase v0.0.0
+replace github.com/mistakeknot/interbase => ../../sdk/interbase/go
+```
+
+**Adopters:** interlock (all 12 tools)
+
+### Test Commands
+
+```bash
+cd go && go test ./...   # 9 tests
+```
+
+## Install (Bash SDK)
 
 ```bash
 bash sdk/interbase/install.sh

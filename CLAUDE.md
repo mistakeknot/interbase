@@ -1,16 +1,19 @@
 # interbase
 
-Shared Bash SDK for dual-mode plugins (standalone + ecosystem). See `AGENTS.md` for full function reference, stub pattern, and nudge protocol.
+Shared SDK for dual-mode plugins (standalone + ecosystem). Bash SDK for hooks + Go SDK for MCP servers. See `AGENTS.md` for full reference.
 
 ## Quick Commands
 
 ```bash
-# Install SDK
+# Install Bash SDK
 bash sdk/interbase/install.sh
 
-# Run tests
+# Run Bash tests
 bash tests/test-guards.sh    # 16 tests
 bash tests/test-nudge.sh     # 4 tests
+
+# Run Go tests
+cd go && go test ./...
 
 # Dev testing with override
 INTERMOD_LIB=/path/to/dev/interbase.sh bash your-hook.sh
@@ -18,6 +21,12 @@ INTERMOD_LIB=/path/to/dev/interbase.sh bash your-hook.sh
 # Simulate standalone mode
 INTERMOD_LIB=/nonexistent bash your-hook.sh
 ```
+
+## Go SDK (`go/`)
+
+Shared Go packages for Demarch MCP servers. Import via `github.com/mistakeknot/interbase`.
+
+- **`toolerror`** — Structured error contract for MCP tool handlers. Types: `NOT_FOUND`, `CONFLICT`, `VALIDATION`, `PERMISSION`, `TRANSIENT`, `INTERNAL`. Use `replace` directive in consumer go.mod: `replace github.com/mistakeknot/interbase => ../../sdk/interbase/go`
 
 ## Design Decisions (Do Not Re-Ask)
 
