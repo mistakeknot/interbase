@@ -27,3 +27,5 @@ ib_phase_set()       { return 0; }
 ib_nudge_companion() { return 0; }
 ib_emit_event()      { return 0; }
 ib_session_status()  { return 0; }
+ib_plugin_cache_path() { echo ""; }
+ib_ecosystem_root()    { echo ""; }

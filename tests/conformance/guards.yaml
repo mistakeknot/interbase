@@ -1,0 +1,57 @@
+# Conformance tests for guard functions.
+# All guards are fail-open: they return false when the dependency is missing.
+domain: guards
+
+tests:
+  - name: has_ic_when_missing
+    setup:
+      PATH: ""  # empty PATH ensures ic is not found
+    call: has_ic
+    expect: false
+
+  - name: has_bd_when_missing
+    setup:
+      PATH: ""
+    call: has_bd
+    expect: false
+
+  - name: has_companion_empty_name
+    call: has_companion
+    args: [""]
+    expect: false
+
+  - name: has_companion_nonexistent
+    call: has_companion
+    args: ["this-plugin-does-not-exist-zzzz"]
+    expect: false
+
+  - name: get_bead_set
+    setup:
+      CLAVAIN_BEAD_ID: "iv-test123"
+    call: get_bead
+    expect: "iv-test123"
+
+  - name: get_bead_unset
+    setup:
+      CLAVAIN_BEAD_ID: ""
+    call: get_bead
+    expect: ""
+
+  - name: in_ecosystem_file_missing
+    setup:
+      INTERMOD_LIB: "/nonexistent/path/interbase.sh"
+    call: in_ecosystem
+    expect: false
+
+  - name: in_sprint_no_bead
+    setup:
+      CLAVAIN_BEAD_ID: ""
+    call: in_sprint
+    expect: false
+
+  - name: in_sprint_no_ic
+    setup:
+      CLAVAIN_BEAD_ID: "iv-test"
+      PATH: ""
+    call: in_sprint
+    expect: false

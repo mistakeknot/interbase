@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "interbase"
+version = "2.0.0"
+description = "Shared integration SDK for Demarch Interverse plugins"
+requires-python = ">=3.11"
+license = "MIT"
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "pyyaml>=6.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["interbase"]

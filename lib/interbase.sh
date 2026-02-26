@@ -151,3 +151,29 @@ ib_nudge_companion() {
     _ib_nudge_session_increment
     _ib_nudge_record "$plugin" "$companion"
 }
+
+# --- Config + Discovery ---
+
+ib_plugin_cache_path() {
+    local plugin="${1:-}"
+    [[ -n "$plugin" ]] || return 0
+    local matches
+    matches=$(compgen -G "${HOME}/.claude/plugins/cache/*/${plugin}/*" 2>/dev/null | sort | tail -1)
+    echo "${matches:-}"
+}
+
+ib_ecosystem_root() {
+    if [[ -n "${DEMARCH_ROOT:-}" ]]; then
+        echo "$DEMARCH_ROOT"
+        return
+    fi
+    local dir
+    dir="$(pwd)"
+    while [[ "$dir" != "/" ]]; do
+        if [[ -d "$dir/sdk/interbase" ]]; then
+            echo "$dir"
+            return
+        fi
+        dir="$(dirname "$dir")"
+    done
+}

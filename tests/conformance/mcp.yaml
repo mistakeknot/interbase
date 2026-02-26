@@ -1,0 +1,52 @@
+# Conformance tests for MCP contracts (Go + Python only).
+# Bash is excluded — hooks don't run MCP servers.
+domain: mcp
+languages: [go, python]
+
+tests:
+  - name: toolerror_not_found_wire_format
+    call: toolerror_new
+    args: ["NOT_FOUND", "agent gone"]
+    expect_json:
+      type: "NOT_FOUND"
+      message: "agent gone"
+      recoverable: false
+
+  - name: toolerror_transient_default_recoverable
+    call: toolerror_new
+    args: ["TRANSIENT", "db busy"]
+    expect_json:
+      type: "TRANSIENT"
+      message: "db busy"
+      recoverable: true
+
+  - name: toolerror_with_data
+    call: toolerror_new_with_data
+    args: ["NOT_FOUND", "gone"]
+    data:
+      file: "main.go"
+    expect_json:
+      type: "NOT_FOUND"
+      message: "gone"
+      recoverable: false
+      data:
+        file: "main.go"
+
+  - name: toolerror_str_format
+    call: toolerror_str
+    args: ["NOT_FOUND", "agent gone"]
+    expect: "[NOT_FOUND] agent gone"
+
+  - name: toolerror_wrap_passthrough
+    call: toolerror_wrap_tool_error
+    args: ["NOT_FOUND", "gone"]
+    expect_json:
+      type: "NOT_FOUND"
+      message: "gone"
+
+  - name: toolerror_wrap_generic
+    call: toolerror_wrap_generic
+    args: ["bad value"]
+    expect_json:
+      type: "INTERNAL"
+      expect_message_contains: "bad value"

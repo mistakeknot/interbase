@@ -1,0 +1,23 @@
+# Conformance tests for action functions.
+# All actions are silent no-ops when dependencies are absent.
+domain: actions
+
+tests:
+  - name: phase_set_without_bd
+    setup:
+      PATH: ""
+    call: phase_set
+    args: ["bead-123", "planned"]
+    expect_error: false
+
+  - name: emit_event_without_ic
+    setup:
+      PATH: ""
+    call: emit_event
+    args: ["run-123", "test-event"]
+    expect_error: false
+
+  - name: session_status_format
+    call: session_status
+    expect_contains: "[interverse]"
+    expect_contains_all: ["beads=", "ic="]

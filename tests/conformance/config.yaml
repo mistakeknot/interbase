@@ -1,0 +1,20 @@
+# Conformance tests for config + discovery functions.
+domain: config
+
+tests:
+  - name: plugin_cache_path_empty
+    call: plugin_cache_path
+    args: [""]
+    expect: ""
+
+  - name: ecosystem_root_env_override
+    setup:
+      DEMARCH_ROOT: "/test/demarch"
+    call: ecosystem_root
+    expect: "/test/demarch"
+
+  - name: ecosystem_root_unset_no_crash
+    setup:
+      DEMARCH_ROOT: ""
+    call: ecosystem_root
+    expect_no_error: true
