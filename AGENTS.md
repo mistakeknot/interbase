@@ -13,10 +13,11 @@ sdk/interbase/
     interbase-stub.sh   — shipped inside each plugin
     integration.json    — schema template for plugin integration manifests
   tests/
-    test-guards.sh      — guard function + stub fallback tests
-    test-nudge.sh       — nudge protocol tests
+    test-guards.sh      — guard function + stub fallback tests (16 assertions)
+    test-nudge.sh       — nudge protocol tests (4 assertions)
   go/
-    go.mod              — Go module: github.com/mistakeknot/interbase
+    go.mod              — Go module: github.com/mistakeknot/interbase (Go 1.23, mcp-go v0.43.2)
+    README.md           — standalone Go SDK reference
     toolerror/
       toolerror.go      — structured error contract for MCP servers
       toolerror_test.go — 9 tests
@@ -89,7 +90,7 @@ require github.com/mistakeknot/interbase v0.0.0
 replace github.com/mistakeknot/interbase => ../../sdk/interbase/go
 ```
 
-**Adopters:** interlock (all 12 tools)
+**Adopters:** interlock (all 12 MCP tool handlers)
 
 ### mcputil — MCP Tool Handler Middleware
 
@@ -112,6 +113,7 @@ s := server.NewMCPServer("myserver", "0.1.0",
 
 // Read metrics snapshot:
 stats := metrics.ToolMetrics()  // map[string]ToolStats
+// ToolStats implements fmt.Stringer: "calls=N errors=N duration=Xs"
 ```
 
 **Convenience helpers** (replace verbose `mcp.NewToolResultError(toolerror.New(...).JSON()), nil`):
@@ -123,7 +125,7 @@ return mcputil.TransientError("service unavailable")
 return mcputil.WrapError(err)  // wraps any error as ErrInternal
 ```
 
-**Adopters:** interlock (middleware + helpers in all 12 tools)
+**Adopters:** interlock (middleware + helpers in all 12 MCP tool handlers)
 
 ### Test Commands
 
@@ -166,6 +168,17 @@ bash sdk/interbase/tests/test-guards.sh   # 16 tests
 bash sdk/interbase/tests/test-nudge.sh     # 4 tests
 ```
 
+## Adopters (Bash SDK)
+
+| Plugin | Functions used |
+|--------|---------------|
+| interflux | `ib_session_status` |
+| intermem | `ib_session_status`, `ib_nudge_companion` |
+| intersynth | `ib_session_status`, `ib_nudge_companion` |
+| interline | `ib_session_status` |
+
+All four ship `interbase-stub.sh` in their `hooks/` directory and source it from `session-start.sh`.
+
 ## Load Guard Pattern
 
 The stub must NOT set `_INTERBASE_LOADED` before attempting to source the live copy — otherwise the live copy's own guard would short-circuit, skipping all function definitions. The guard is only set in the fallback (stub) path.
@@ -180,4 +193,4 @@ The stub must NOT set `_INTERBASE_LOADED` before attempting to source the live c
 
 ## Relationship to interband
 
-interband (`infra/interband/`) provides data sharing between plugins (key-value state, channels). interbase provides code sharing (SDK functions). Both use the same resolution pattern: env override → monorepo path → home directory fallback.
+interband (`core/interband/`) provides data sharing between plugins (key-value state, channels). interbase provides code sharing (SDK functions). Both use the same resolution pattern: env override → monorepo path → home directory fallback.
