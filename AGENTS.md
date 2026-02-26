@@ -6,55 +6,12 @@ Multi-language SDK enabling Interverse plugins to work in both standalone (Claud
 
 ```
 sdk/interbase/
-  lib/
-    interbase.sh    — core Bash SDK (installed to ~/.intermod/interbase/)
-    VERSION         — semver for installed copy (currently 2.0.0)
-  templates/
-    interbase-stub.sh   — shipped inside each plugin
-    integration.json    — schema template for plugin integration manifests
-  tests/
-    test-guards.sh      — guard function + stub fallback tests (16 assertions)
-    test-nudge.sh       — nudge protocol tests (4 assertions)
-    test-config.sh      — config function tests (5 assertions)
-    conformance/
-      guards.yaml       — cross-language guard test cases
-      actions.yaml      — cross-language action test cases
-      config.yaml       — cross-language config test cases
-      mcp.yaml          — MCP contract tests (Go + Python only)
-    runners/
-      run_bash.sh       — conformance runner for Bash
-      run_go.sh         — conformance runner for Go
-      run_python.sh     — conformance runner for Python
-  go/
-    go.mod              — Go module: github.com/mistakeknot/interbase (Go 1.23, mcp-go v0.43.2)
-    interbase.go        — root package: guards, actions, config/discovery
-    interbase_test.go   — 19 tests
-    conformance_test.go — YAML-driven conformance tests
-    README.md           — standalone Go SDK reference
-    toolerror/
-      toolerror.go      — structured error contract for MCP servers
-      toolerror_test.go — 9 tests
-    mcputil/
-      instrument.go      — tool handler middleware (timing, errors, panics, metrics)
-      instrument_test.go — 8 tests
-  python/
-    pyproject.toml      — Python package config (hatchling, requires-python >=3.11)
-    interbase/
-      __init__.py       — public API re-exports, __version__ = "2.0.0"
-      guards.py         — fail-open guard functions
-      actions.py        — silent no-op action functions
-      config.py         — config + discovery functions
-      nudge.py          — companion nudge protocol
-      toolerror.py      — structured MCP error contract (wire-compatible with Go)
-      mcputil.py        — MCP metrics middleware
-    tests/
-      test_guards.py    — guard function tests
-      test_actions.py   — action function tests
-      test_config.py    — config function tests
-      test_toolerror.py — toolerror tests
-      test_mcputil.py   — metrics middleware tests
-      test_conformance.py — YAML-driven conformance tests
-  install.sh            — deploy Bash SDK to ~/.intermod/interbase/
+  lib/interbase.sh      — core Bash SDK (installed to ~/.intermod/interbase/)
+  templates/            — interbase-stub.sh (ships in plugins) + integration.json schema
+  go/                   — Go SDK (interbase.go, toolerror/, mcputil/) — 36 tests
+  python/               — Python SDK (guards, actions, config, nudge, toolerror, mcputil) — 6 test files
+  tests/                — Bash tests (25 assertions) + conformance/ (YAML-driven, 3 runners)
+  install.sh            — deploy to ~/.intermod/interbase/
 ```
 
 ## Function Reference

@@ -31,27 +31,13 @@ INTERMOD_LIB=/path/to/dev/interbase.sh bash your-hook.sh
 INTERMOD_LIB=/nonexistent bash your-hook.sh
 ```
 
-## Go SDK (`go/`)
+## SDK APIs
 
-Shared Go packages for Demarch MCP servers. Import via `github.com/mistakeknot/interbase`.
+Three SDKs (Bash, Go, Python) with identical semantics — Guards (fail-open), Actions (no-op without deps), Config. See [AGENTS.md](./AGENTS.md) for full API reference per language.
 
-- **Root package** — Guards (`HasIC`, `HasBD`, `HasCompanion`, `InEcosystem`, `GetBead`, `InSprint`), Actions (`PhaseSet`, `EmitEvent`, `SessionStatus`), Config (`PluginCachePath`, `EcosystemRoot`, `NudgeCompanion`). All fail-open.
-- **`toolerror`** — Structured error contract for MCP tool handlers. Types: `NOT_FOUND`, `CONFLICT`, `VALIDATION`, `PERMISSION`, `TRANSIENT`, `INTERNAL`. Use `replace` directive in consumer go.mod: `replace github.com/mistakeknot/interbase => ../../sdk/interbase/go`
-- **`mcputil`** — MCP tool handler middleware: timing metrics, error counting, panic recovery, structured error wrapping. Use `metrics.Instrument()` with `server.WithToolHandlerMiddleware()`. Also provides convenience helpers: `ValidationError()`, `NotFoundError()`, `ConflictError()`, `TransientError()`, `WrapError()`
-
-## Python SDK (`python/`)
-
-Shared Python package for Demarch hooks and scripts. Install via `uv pip install -e sdk/interbase/python`.
-
-- **Guards** — `has_ic()`, `has_bd()`, `has_companion()`, `in_ecosystem()`, `get_bead()`, `in_sprint()`. All return False when deps missing.
-- **Actions** — `phase_set()`, `emit_event()`, `session_status()`. All silent no-ops without deps.
-- **Config** — `plugin_cache_path()`, `ecosystem_root()`, `nudge_companion()`.
-- **`toolerror`** — `ToolError` exception with wire-format parity to Go. 6 error types, JSON serialization.
-- **`mcputil`** — `McpMetrics` with `instrument()` for handler wrapping.
-
-## Conformance Tests (`tests/conformance/`)
-
-YAML-defined test cases run by thin per-language runners. Ensures Bash, Go, and Python stay in sync. MCP tests excluded for Bash.
+- **Go:** `import github.com/mistakeknot/interbase` — uses `replace` directive in consumer go.mod
+- **Python:** `uv pip install -e sdk/interbase/python`
+- **Conformance tests:** `tests/conformance/` — YAML-defined, run by per-language runners
 
 ## Design Decisions (Do Not Re-Ask)
 
