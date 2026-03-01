@@ -31,7 +31,7 @@ jobs:
       - name: Install deps
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
-          cd python && uv sync
+          cd python && uv sync --extra test
       - name: Test
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
@@ -72,7 +72,7 @@ jobs:
       - name: Run conformance tests
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
-          cd python && uv sync
+          cd python && uv sync --extra test
           cd ..
           bash tests/runners/run_bash.sh
           bash tests/runners/run_go.sh
