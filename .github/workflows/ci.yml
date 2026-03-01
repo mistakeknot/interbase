@@ -72,6 +72,7 @@ jobs:
       - name: Run conformance tests
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
+          pip install pyyaml
           cd python && uv sync --extra test
           cd ..
           bash tests/runners/run_bash.sh
