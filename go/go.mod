@@ -1,4 +1,4 @@
-module github.com/mistakeknot/interbase
+module github.com/mistakeknot/interbase/go
 
 go 1.23.0
 

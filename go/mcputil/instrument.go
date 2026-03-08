@@ -22,7 +22,7 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
-	"github.com/mistakeknot/interbase/toolerror"
+	"github.com/mistakeknot/interbase/go/toolerror"
 )
 
 // toolCounters holds atomic counters for a single tool.

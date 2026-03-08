@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/mistakeknot/interbase/toolerror"
+	"github.com/mistakeknot/interbase/go/toolerror"
 )
 
 func TestNew(t *testing.T) {

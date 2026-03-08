@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mistakeknot/interbase/toolerror"
+	"github.com/mistakeknot/interbase/go/toolerror"
 
 	"gopkg.in/yaml.v3"
 )
