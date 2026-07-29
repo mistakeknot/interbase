@@ -1,2 +1,5 @@
 *.swp
 .DS_Store
+
+# Machine-local interspect telemetry (SQLite); git-autosync does 'git add -A'
+.clavain/interspect/
